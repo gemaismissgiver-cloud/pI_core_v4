@@ -1,0 +1,36 @@
+name: Android APK bauen
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Code holen
+        uses: actions/checkout@v4
+
+      - name: APK mit Buildozer bauen
+        uses: ArtemSBulgakov/buildozer-action@v1.3
+        with:
+          command: android debug
+          workdir: .
+          buildozer_version: master
+
+      - name: APK als Artefakt hochladen
+        uses: actions/upload-artifact@v4
+        with:
+          name: pi-v4-apk
+          path: bin/*.apk
+
+      - name: APK direkt als Release veröffentlichen (ohne ZIP)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          TAG="v1.0.${{ github.run_number }}"
+          gh release create "$TAG" bin/*.apk --title "PI v4 $TAG" --notes "Direkte APK-Datei zum Installieren"
