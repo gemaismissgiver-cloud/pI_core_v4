@@ -5,7 +5,7 @@ package.domain = de.pi
 source.dir = .
 source.include_exts = py,json,png,jpg,ttf,kv
 version = 1.0
-requirements = python3,kivy==2.3.0,pyjnius,pillow
+requirements = python3,kivy==2.3.0,pyjnius
 orientation = portrait
 fullscreen = 0
 android.permissions = INTERNET
