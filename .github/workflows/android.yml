@@ -13,14 +13,21 @@ jobs:
       - name: Code holen
         uses: actions/checkout@v4
 
-      - name: APK mit Buildozer bauen
-        uses: ArtemSBulgakov/buildozer-action@v1
+      - name: Python einrichten
+        uses: actions/setup-python@v5
         with:
-          command: android debug
-          workdir: .
-          buildozer_version: stable
+          python-version: '3.11'
 
-      - name: APK als Release veröffentlichen (ohne ZIP)
+      - name: Werkzeuge installieren
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y git zip unzip openjdk-17-jdk autoconf libtool pkg-config zlib1g-dev libffi-dev libssl-dev
+          pip install buildozer cython
+
+      - name: APK bauen
+        run: buildozer android debug
+
+      - name: APK als Release veröffentlichen
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
