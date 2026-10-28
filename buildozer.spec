@@ -19,3 +19,6 @@ android.gradle_build_options = --warning-mode=all
 [buildozer]
 log_level = 2
 warn_on_root = 1
+
+# Verhindert den Versionsfehler und nutzt den stabilen Entwicklungszweig
+p4a.branch = develop
