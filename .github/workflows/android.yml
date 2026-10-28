@@ -1,52 +1,23 @@
-name: Android APK bauen
-on:
-  push:
-  workflow_dispatch:
+[app]
+title = PI v4
+package.name = piv4
+package.domain = de.pi
+source.dir = .
+source.include_exts = py,json,png,jpg,ttf,kv
+version = 1.0
+requirements = python3,kivy==2.3.0,pyjnius
+orientation = portrait
+fullscreen = 0
+android.permissions = INTERNET
+android.api = 34
+android.minapi = 26
+android.archs = arm64-v8a
+android.ndk = 27c
+android.accept_sdk_license = True
+android.gradle_build_options = --warning-mode=all
 
-permissions:
-  contents: write
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Code holen
-        uses: actions/checkout@v4
-
-      - name: Python einrichten
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - name: Werkzeuge installieren
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y git zip unzip openjdk-17-jdk autoconf libtool pkg-config zlib1g-dev libffi-dev libssl-dev ffmpeg
-                    pip install "buildozer==1.5.0" "python-for-android==2024.1.4" "cython==3.0.11"
-      - name: Android SDK manuell ohne alte Tools einrichten
-        uses: android-actions/setup-android@v3
-        with:
-          # Verhindert, dass die Action nach dem gelöschten 'tools'-Paket sucht
-          packages: 'platform-tools build-tools;34.0.0 platforms;android-34'
-
-      - name: Buildozer vorbereiten
-        run: |
-          mkdir -p ~/.android
-          touch ~/.android/repositories.cfg
-          if [ ! -f buildozer.spec ]; then
-            buildozer init
-          fi
-
-      - name: APK bauen
-        run: |
-          yes | buildozer -v android debug
-
-      - name: APK als Release veröffentlichen
-        if: success()
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
-          TAG="v1.0.${{ github.run_number }}"
-          gh release create "$TAG" bin/*.apk --title "PI v4 $TAG" --notes "Direkte APK-Datei"
+[buildozer]
+log_level = 2
+warn_on_root = 1
+p4a.branch = develop
+  
