@@ -21,13 +21,25 @@ jobs:
       - name: Werkzeuge installieren
         run: |
           sudo apt-get update
-          sudo apt-get install -y git zip unzip openjdk-17-jdk autoconf libtool pkg-config zlib1g-dev libffi-dev libssl-dev
+          sudo apt-get install -y git zip unzip openjdk-17-jdk autoconf libtool pkg-config zlib1g-dev libffi-dev libssl-dev ffmpeg
           pip install buildozer cython
 
-      - name: SDK selbst installieren lassen
+      - name: Buildozer und Android SDK vorbereiten
         run: |
-          rm -rf ~/.buildozer/android/platform/android-sdk
-          buildozer android debug
+          # Akzeptiert die Android-Lizenzen automatisch im Voraus
+          mkdir -p ~/.android
+          touch ~/.android/repositories.cfg
+          
+          # Führt den Build im nicht-interaktiven Modus aus
+          # Falls keine buildozer.spec existiert, erstelle eine Standard-Datei
+          if [ ! -f buildozer.spec ]; then
+            buildozer init
+          fi
+
+      - name: APK bauen
+        run: |
+          # yes | erzwingt die automatische Zustimmung für alle SDK-Downloads
+          yes | buildozer -v android debug
 
       - name: APK als Release veröffentlichen
         if: success()
