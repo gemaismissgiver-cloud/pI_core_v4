@@ -24,21 +24,22 @@ jobs:
           sudo apt-get install -y git zip unzip openjdk-17-jdk autoconf libtool pkg-config zlib1g-dev libffi-dev libssl-dev ffmpeg
           pip install buildozer cython
 
-      - name: Buildozer und Android SDK vorbereiten
+      - name: Android SDK manuell ohne alte Tools einrichten
+        uses: android-actions/setup-android@v3
+        with:
+          # Verhindert, dass die Action nach dem gelöschten 'tools'-Paket sucht
+          packages: 'platform-tools build-tools;34.0.0 platforms;android-34'
+
+      - name: Buildozer vorbereiten
         run: |
-          # Akzeptiert die Android-Lizenzen automatisch im Voraus
           mkdir -p ~/.android
           touch ~/.android/repositories.cfg
-          
-          # Führt den Build im nicht-interaktiven Modus aus
-          # Falls keine buildozer.spec existiert, erstelle eine Standard-Datei
           if [ ! -f buildozer.spec ]; then
             buildozer init
           fi
 
       - name: APK bauen
         run: |
-          # yes | erzwingt die automatische Zustimmung für alle SDK-Downloads
           yes | buildozer -v android debug
 
       - name: APK als Release veröffentlichen
